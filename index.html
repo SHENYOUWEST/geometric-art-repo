@@ -4,36 +4,46 @@
     <style>
         body { 
             display: flex; justify-content: center; align-items: center; 
-            height: 100vh; background-color: #f4f4f0; overflow: hidden; margin: 0;
+            height: 100vh; background-color: #111111; /* 改为深色背景 */
+            overflow: hidden; margin: 0;
         }
-        .container { position: relative; width: 300px; height: 300px; }
+        .container { position: relative; width: 400px; height: 400px; }
         .circle { 
-            position: absolute; top: 50px; left: 20px;
+            position: absolute; top: 80px; left: 50px;
             width: 120px; height: 120px; background-color: #e32636; border-radius: 50%; 
-            transition: transform 0.1s ease-out; mix-blend-mode: multiply;
+            mix-blend-mode: screen; transition: transform 0.2s ease-out;
         }
         .rectangle { 
-            position: absolute; bottom: 50px; right: 20px;
+            position: absolute; bottom: 80px; right: 50px;
             width: 160px; height: 100px; background-color: #1a5b92; 
-            transition: transform 0.1s ease-out; mix-blend-mode: multiply;
+            mix-blend-mode: screen; transition: transform 0.2s ease-out;
+        }
+        /* 新增：包豪斯经典的黄色三角形 */
+        .triangle { 
+            position: absolute; top: 150px; left: 140px;
+            width: 0; height: 0; 
+            border-left: 70px solid transparent; 
+            border-right: 70px solid transparent; 
+            border-bottom: 120px solid #f9d71c; 
+            mix-blend-mode: screen; transition: transform 0.2s ease-out;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="circle" id="shape1"></div>
-        <div class="rectangle" id="shape2"></div>
+        <div class="circle" id="s1"></div>
+        <div class="rectangle" id="s2"></div>
+        <div class="triangle" id="s3"></div>
     </div>
 
     <script>
-        // 监听鼠标在整个页面的移动
         document.addEventListener('mousemove', function(e) {
-            const xAxis = (window.innerWidth / 2 - e.pageX) / 15;
-            const yAxis = (window.innerHeight / 2 - e.pageY) / 15;
+            const x = (window.innerWidth / 2 - e.pageX) / 20;
+            const y = (window.innerHeight / 2 - e.pageY) / 20;
             
-            // 让图形根据鼠标位置产生位移和旋转
-            document.getElementById('shape1').style.transform = `translate(${xAxis}px, ${yAxis}px) scale(1.1)`;
-            document.getElementById('shape2').style.transform = `translate(${-xAxis}px, ${-yAxis}px) rotate(${xAxis}deg)`;
+            document.getElementById('s1').style.transform = `translate(${x}px, ${y}px)`;
+            document.getElementById('s2').style.transform = `translate(${-x}px, ${-y}px) rotate(${x}deg)`;
+            document.getElementById('s3').style.transform = `translate(${y}px, ${-x}px) scale(1.2)`;
         });
     </script>
 </body>
