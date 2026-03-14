@@ -1,50 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <title>3D Geometric Art</title>
     <style>
-        body { 
-            display: flex; justify-content: center; align-items: center; 
-            height: 100vh; background-color: #111111; /* 改为深色背景 */
-            overflow: hidden; margin: 0;
-        }
-        .container { position: relative; width: 400px; height: 400px; }
-        .circle { 
-            position: absolute; top: 80px; left: 50px;
-            width: 120px; height: 120px; background-color: #e32636; border-radius: 50%; 
-            mix-blend-mode: screen; transition: transform 0.2s ease-out;
-        }
-        .rectangle { 
-            position: absolute; bottom: 80px; right: 50px;
-            width: 160px; height: 100px; background-color: #1a5b92; 
-            mix-blend-mode: screen; transition: transform 0.2s ease-out;
-        }
-        /* 新增：包豪斯经典的黄色三角形 */
-        .triangle { 
-            position: absolute; top: 150px; left: 140px;
-            width: 0; height: 0; 
-            border-left: 70px solid transparent; 
-            border-right: 70px solid transparent; 
-            border-bottom: 120px solid #f9d71c; 
-            mix-blend-mode: screen; transition: transform 0.2s ease-out;
-        }
+        body { margin: 0; overflow: hidden; background-color: #111111; }
+        canvas { display: block; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="circle" id="s1"></div>
-        <div class="rectangle" id="s2"></div>
-        <div class="triangle" id="s3"></div>
-    </div>
+    <script type="module">
+        import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
-    <script>
-        document.addEventListener('mousemove', function(e) {
-            const x = (window.innerWidth / 2 - e.pageX) / 20;
-            const y = (window.innerHeight / 2 - e.pageY) / 20;
-            
-            document.getElementById('s1').style.transform = `translate(${x}px, ${y}px)`;
-            document.getElementById('s2').style.transform = `translate(${-x}px, ${-y}px) rotate(${x}deg)`;
-            document.getElementById('s3').style.transform = `translate(${y}px, ${-x}px) scale(1.2)`;
+        // 1. 搭建舞台 (Scene)、相机 (Camera) 和 渲染器 (Renderer)
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        document.body.appendChild( renderer.domElement );
+
+        // 2. 打光 (让 3D 物体有立体感)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // 环境光
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // 平行光
+        directionalLight.position.set(5, 5, 5);
+        scene.add(directionalLight);
+
+        // 3. 创作 3D 几何体 (红球、蓝方块、黄圆锥)
+        const group = new THREE.Group(); // 建立一个组，把三个图形打包
+
+        const sphereGeo = new THREE.SphereGeometry( 1.2, 32, 16 );
+        const sphereMat = new THREE.MeshStandardMaterial( { color: 0xe32636, roughness: 0.2 } ); 
+        const sphere = new THREE.Mesh( sphereGeo, sphereMat );
+        sphere.position.set(-2.5, 0, 0);
+        group.add(sphere);
+
+        const cubeGeo = new THREE.BoxGeometry( 1.8, 1.8, 1.8 );
+        const cubeMat = new THREE.MeshStandardMaterial( { color: 0x1a5b92, roughness: 0.2 } ); 
+        const cube = new THREE.Mesh( cubeGeo, cubeMat );
+        cube.position.set(2.5, 0, 0);
+        group.add(cube);
+
+        const coneGeo = new THREE.ConeGeometry( 1.2, 2.5, 32 );
+        const coneMat = new THREE.MeshStandardMaterial( { color: 0xf9d71c, roughness: 0.2 } ); 
+        const cone = new THREE.Mesh( coneGeo, coneMat );
+        cone.position.set(0, 1.5, 0);
+        group.add(cone);
+
+        scene.add(group);
+        camera.position.z = 7;
+
+        // 4. 添加鼠标交互逻辑
+        let mouseX = 0;
+        let mouseY = 0;
+        document.addEventListener('mousemove', (event) => {
+            // 将鼠标坐标转换为 3D 空间坐标系
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
         });
+
+        // 5. 让世界动起来 (动画循环)
+        function animate() {
+            requestAnimationFrame( animate );
+            
+            // 几何体自转
+            group.rotation.x += 0.005;
+            group.rotation.y += 0.01;
+            
+            // 带有阻尼感的鼠标跟随效果
+            group.position.x += (mouseX * 3 - group.position.x) * 0.05;
+            group.position.y += (mouseY * 3 - group.position.y) * 0.05;
+            
+            renderer.render( scene, camera );
+        }
+        animate();
     </script>
 </body>
 </html>
